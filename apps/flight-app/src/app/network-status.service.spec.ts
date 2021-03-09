@@ -1,10 +1,11 @@
+import { interval } from 'rxjs';
 import { marbles } from 'rxjs-marbles';
 import { take } from 'rxjs/operators';
 import { NetworkStatus } from './network-status.service';
 
 describe('NetworkStatusService', () => {
 
-  it.only('should initially emit offline with random 0.50', marbles((m) => {
+  it('should initially emit offline with random 0.50', marbles((m) => {
     const networkStatus = new NetworkStatus(() => .50);
     const destination = networkStatus.online$.pipe(take(1));
 
@@ -52,10 +53,23 @@ describe('NetworkStatusService', () => {
     const sub3 = '2001ms ^';
     const dest1 = 't 1999ms (f|)';
     const dest2 = '1999ms t (f|)';
-    const dest3 = '2001ms f 999ms (t|)';
+    const dest3 = '2001ms t 1999ms (f|)';
 
     m.expect(source, sub1).toBeObservable(dest1, { t: true, f: false });
     m.expect(source, sub2).toBeObservable(dest2, { t: true, f: false });
     m.expect(source, sub3).toBeObservable(dest3, { t: true, f: false });
   }));
+
+  it('should do basic things', marbles((m) => {
+    const dest = interval(1000).pipe(take(1));
+    m.expect(dest).toBeObservable('1s (n|)', { n: 0 });
+  }));
+
+  it('should do old-school', (done) => {
+    const dest = interval(1000).pipe(take(1));
+    dest.subscribe(number => {
+      expect(number).toBe(0);
+      done();
+    });
+  });
 });

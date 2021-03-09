@@ -16,14 +16,14 @@ describe('FlightLookahead', () => {
       f: false,
       t: true
     });
-    const find$ = m.cold('f', { f: flights });
+    const find$ = m.cold('500ms f', { f: flights });
 
     const networkStatus = { online$ } as unknown as NetworkStatus;
     const flightService = { find: () => find$ } as unknown as FlightService;
     const service = new FlightLookaheadService(flightService, networkStatus);
-    const flights$ = service.search(m.cold('w', { w: 'Wien' }));
+    const flights$ = service.search(m.cold('1200ms w', { w: 'Wien' }));
 
-    m.expect(flights$).toBeObservable('1001ms f', { f: flights });
+    m.expect(flights$).toBeObservable('2000ms f', { f: flights });
   }));
 
   it('should load immediately in online mode', marbles((m) => {
